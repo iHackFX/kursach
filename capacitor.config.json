@@ -1,6 +1,6 @@
 {
-  "appId": "io.ionic.starter",
-  "appName": "TestApp",
+  "appId": "com.ihackfx.moneyCollect",
+  "appName": "Money Collect",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "build",
@@ -9,5 +9,6 @@
       "launchShowDuration": 0
     }
   },
+  "windowsAndroidStudioPath": "D:\\JetBrains\\apps\\AndroidStudio\\ch-0\\201.7042882\\bin\\studio64.exe",
   "cordova": {}
 }
