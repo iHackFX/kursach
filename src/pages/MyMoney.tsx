@@ -122,16 +122,14 @@ const MyMoney: React.FC = () => {
         )}
         {parsedData
           ? parsedData.map((data, i) => {
-              if (data.type == "Расходы") {
-                return (
-                  <IonItem key={i}>
-                    <IonLabel slot="start">
-                      <p>{data.date}</p>
-                    </IonLabel>
-                    <IonLabel>{data.value} р.</IonLabel>
-                  </IonItem>
-                );
-              }
+              return (
+                <IonItem key={i}>
+                  <IonLabel slot="start">
+                    <p>{data.date}</p>
+                  </IonLabel>
+                  <IonLabel>{data.value} р.</IonLabel>
+                </IonItem>
+              );
             })
           : ""}
       </IonContent>
