@@ -125,6 +125,7 @@ const MyMoney: React.FC = () => {
               return (
                 <IonItem key={i}>
                   <IonLabel slot="start">
+                    <h2>{data.type}</h2>
                     <p>{data.date}</p>
                   </IonLabel>
                   <IonLabel>{data.value} р.</IonLabel>
