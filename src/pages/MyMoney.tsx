@@ -31,30 +31,22 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./Tab1.css";
 import { AddDataModal } from "../components/addDataModal";
 import { Plugins } from "@capacitor/core";
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from "node:constants";
-interface DataArray {
-  date: string;
-  type: string;
-  value: string;
-}
-
+import DataArray from "../components/interfaces";
+import ActionSheet from "../components/ActionSheet";
+import { keys } from "../components/storage";
 const { Storage } = Plugins;
 
 const MyMoney: React.FC = () => {
   const [showState, setShowState] = useState(false);
   const [data, setData] = useState("");
   const [getType, setGetType] = useState("Всё");
+  const [showActionSheet, setShowActionSheet] = useState("");
   const [keysData, setKeysData] = useState<Array<string>>([]);
   const [parsedData, setParsedData] = useState<Array<DataArray>>([]);
-  async function keys() {
-    const { keys } = await Storage.keys();
-    // console.log({ "Storage KEYS: ": keys });
-    setKeysData(keys);
-  }
 
   async function getItem(key: string) {
     const { value } = await Storage.get({ key: key });
-    // console.log({ key: key, value: JSON.parse(String(value)).data });
+    console.log({ key: key, value: JSON.parse(String(value)) });
     if (typeof value === "string") {
       return JSON.parse(String(value)).data;
     }
@@ -94,13 +86,13 @@ const MyMoney: React.FC = () => {
   }
 
   function doRefresh(event: CustomEvent<RefresherEventDetail>) {
-    keys().finally(() =>
+    keys(setKeysData).finally(() =>
       getItems(keysData).finally(() => event.detail.complete())
     );
   }
 
   function doRefreshGo() {
-    keys().finally(() => getItems(keysData));
+    keys(setKeysData).finally(() => getItems(keysData));
   }
 
   useEffect(() => {
@@ -166,12 +158,14 @@ const MyMoney: React.FC = () => {
         {parsedData
           ? parsedData.map((data, i) => {
               return (
-                <IonItem key={i}>
+                <IonItem key={i} onClick={() => {setShowActionSheet(data.uuid)}}>
                   <IonLabel slot="start">
                     <h2>{data.type}</h2>
+                    <h3>{data.description}</h3>
                     <p>{data.date}</p>
                   </IonLabel>
                   <IonLabel>{data.value} р.</IonLabel>
+                  <ActionSheet setShowActionSheet={setShowActionSheet} showActionSheet={showActionSheet} uuid={data.uuid} keyToDelete={data.date}></ActionSheet>
                 </IonItem>
               );
             })

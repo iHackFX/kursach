@@ -19,13 +19,9 @@ import {
 import { Plugins } from "@capacitor/core";
 import { useEffect, useState } from "react";
 import "./Tab3.css";
+import { keys, getItem } from "../components/storage";
+import DataArray from "../components/interfaces";
 const { Storage } = Plugins;
-
-interface DataArray {
-  date: string;
-  type: string;
-  value: string;
-}
 
 function random(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -43,28 +39,19 @@ const Tab3: React.FC = () => {
   for (var i = 0; i < 15; i++) {
     defaultData.push(random(3000));
   }
-  
-  async function keys() {
-    const { keys } = await Storage.keys();
-    // console.log({ "Storage KEYS: ": keys });
-    setKeysData(keys);
-  }
-
-  async function getItem(key: string) {
-    const { value } = await Storage.get({ key: key });
-    // console.log({ key: key, value: JSON.parse(String(value)) });
-    return value;
-  }
 
   async function getItems(keys: Array<string>) {
     var data: Array<number> = [];
     var legendData: Array<string> = [];
     for (var i = 0; i < keys.length; i++) {
-      var a = await getItem(keys[i]);
-      let d : Array<DataArray> = JSON.parse(String(a)).data;
-      for(let i = 0; i < d.length; i++){
-        data.push(parseFloat(d[i].value));
-        legendData.push(d[i].date + " " + d[i].type); 
+      var a : Array<DataArray> = await getItem(keys[i]);
+      for(let i = 0; i < a.length; i++){
+        data.push(parseFloat(a[i].value));
+        let desc = a[i].date + " " + a[i].type;
+        if(a[i].description !== null){
+          desc += "\n" + a[i].description;
+        }
+        legendData.push(desc); 
       }
     }
     setParsedData(data);
@@ -72,7 +59,10 @@ const Tab3: React.FC = () => {
   }
 
   function doRefreshGo() {
-    keys().finally(() => getItems(keysData));
+    keys(setKeysData).finally(() => {
+      keysData.reverse();
+      getItems(keysData);
+    });
   }
 
   useEffect(() => {

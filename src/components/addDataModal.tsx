@@ -14,10 +14,12 @@ import {
   IonIcon,
   IonDatetime,
   IonInput,
+  IonTextarea,
 } from "@ionic/react";
 import { close } from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
 import { useState } from "react";
+import { setItem } from "../components/storage";
 const { Storage } = Plugins;
 
 interface HomeProps {
@@ -39,48 +41,8 @@ export const AddDataModal: React.FC<HomeProps> = ({
   const [dateValue, setDate] = useState("");
   const [typeValue, setType] = useState("");
   const [moneyValue, setMoney] = useState("");
-  async function getItem(month: string) {
-    const { value } = await Storage.get({ key: month });
-    return value;
-  }
+  const [description, setDescription] = useState("");
 
-  async function setItem(date: string, type: string, value: string) {
-    if (type.length < 3) {
-      type = typeOfData;
-    }
-    if (date.length < 3) {
-      date = nowDate;
-    }
-    var dateValue = new Date(date);
-    var dd = String(dateValue.getDate()).padStart(2, "0");
-    var mm = String(dateValue.getMonth() + 1).padStart(2, "0"); //January is 0!
-    var yyyy = dateValue.getFullYear();
-    var dateStamp = dd + "." + mm + "." + yyyy;
-    var oldData = await getItem(dateStamp);
-    if (String(oldData).length > 5) {
-      var newOldData = JSON.parse(String(oldData)).data;
-      await Storage.set({
-        key: dateStamp,
-        value: JSON.stringify({
-          data: [
-            ...newOldData,
-            {
-              date: dateStamp,
-              type: type,
-              value: value,
-            },
-          ],
-        }),
-      });
-    } else {
-      await Storage.set({
-        key: dateStamp,
-        value: JSON.stringify({
-          data: [{ date: dateStamp, type: type, value: value }],
-        }),
-      });
-    }
-  }
   return (
     <IonModal isOpen={showState} onDidDismiss={() => setShowState(false)}>
       <IonHeader translucent>
@@ -126,15 +88,28 @@ export const AddDataModal: React.FC<HomeProps> = ({
               onIonChange={(e) => setMoney(String(e.detail.value))}
             ></IonInput>
           </IonItem>
+          <IonItem>
+            <IonLabel position="floating">
+              Описание
+            </IonLabel>
+            <IonTextarea
+              value={description}
+              onIonChange={(e) => setDescription(e.detail.value!)}
+            ></IonTextarea>
+          </IonItem>
         </IonList>
       </IonContent>
       <IonButton
         type="submit"
         color="success"
         onClick={() => {
-          setItem(dateValue, typeValue, moneyValue).finally(() =>
-            setShowState(false)
-          );
+          setItem(
+            dateValue,
+            typeValue,
+            typeOfData,
+            moneyValue,
+            description
+          ).finally(() => setShowState(false));
         }}
         disabled={moneyValue ? false : true}
       >
