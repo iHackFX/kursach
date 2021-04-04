@@ -60,7 +60,7 @@ export const PieChart: React.FC<LineChartProps> = ({
       ],
     };
   }
-  return <Pie data={graphData} height={500} />;
+  return <Pie data={graphData} height={450} />;
 };
 
 export const LineChart: React.FC<LineChartProps> = ({
@@ -94,7 +94,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       ],
     };
   }
-  return <Line data={graphData} height={500} />;
+  return <Line data={graphData} height={450} />;
 };
 
 export const BarChart: React.FC<BarChartProps> = ({
@@ -138,7 +138,7 @@ export const BarChart: React.FC<BarChartProps> = ({
       labels: headers,
     },
   };
-  return <Bar data={graphData} height={500} />;
+  return <Bar data={graphData} height={450} />;
 };
 
 export const DoughnutChart: React.FC<DoughnutChartProps> = ({
@@ -170,5 +170,5 @@ export const DoughnutChart: React.FC<DoughnutChartProps> = ({
       ],
     };
   }
-  return <Doughnut data={graphData} height={500} />;
+  return <Doughnut data={graphData} height={450} />;
 };

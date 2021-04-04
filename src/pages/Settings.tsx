@@ -7,24 +7,18 @@ import {
   IonList,
   IonPage,
   IonTitle,
-  IonToggle,
   IonToolbar,
 } from "@ionic/react";
-import { moon, settings } from "ionicons/icons";
-import "./Tab2.css";
+import { settingsOutline, trash } from "ionicons/icons";
+import { clearStorage } from "../components/storage";
 
 const Settings: React.FC = () => {
-  function toggleDarkMode() {
-    document.body.classList.toggle("dark");
-    
-    // document.documentElement.classList.toggle("md");
-  }
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonTitle>
-            <IonIcon icon={settings} /> Настройки
+            <IonIcon icon={settingsOutline} /> Настройки
           </IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -34,19 +28,13 @@ const Settings: React.FC = () => {
             <IonTitle size="large">Tab 2</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonList class="theme-list" lines="full">
+        <IonList>
           <IonItem>
             <IonIcon
               slot="start"
-              icon={moon}
-              // class="component-icon component-icon-dark"
+              icon={trash}
             ></IonIcon>
-            <IonLabel>Тёмная тема</IonLabel>
-            <IonToggle
-              slot="end"
-              checked={window.matchMedia('(prefers-color-scheme: dark)').matches}
-              onIonChange={() => toggleDarkMode()}
-            ></IonToggle>
+            <IonLabel>Очистить данные</IonLabel>
           </IonItem>
         </IonList>
       </IonContent>

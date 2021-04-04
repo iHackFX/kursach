@@ -9,7 +9,7 @@ import {
   IonTabs,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { analytics, wallet } from "ionicons/icons";
+import { pieChartOutline, settingsOutline, walletOutline } from "ionicons/icons";
 import MyMoney from "./pages/MyMoney";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
@@ -54,17 +54,17 @@ const App: React.FC = () => (
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="myMoney" href="/my-money">
-            <IonIcon icon={wallet} />
+            <IonIcon icon={walletOutline} />
             <IonLabel>Мои деньги</IonLabel>
           </IonTabButton>
           <IonTabButton tab="statistics" href="/statistics">
-            <IonIcon icon={analytics} />
+            <IonIcon icon={pieChartOutline} />
             <IonLabel>Статистика</IonLabel>
           </IonTabButton>
-          {/* <IonTabButton tab="settings" href="/settings">
-            <IonIcon icon={settings} />
+          <IonTabButton tab="settings" href="/settings">
+            <IonIcon icon={settingsOutline} />
             <IonLabel>Настройки</IonLabel>
-          </IonTabButton> */}
+          </IonTabButton>
         </IonTabBar>
       </IonTabs>
     </IonReactRouter>

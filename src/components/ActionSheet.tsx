@@ -16,7 +16,6 @@ const ActionSheet: React.FC<ActionProps> = ({
   showActionSheet,
   setShowActionSheet,
 }) => {
-  const [showToast, setShowToast] = useState(false);
   return (
     <IonActionSheet
       isOpen={showActionSheet == uuid}
@@ -27,20 +26,10 @@ const ActionSheet: React.FC<ActionProps> = ({
           text: "Удалить",
           role: "destructive",
           icon: trash,
-          handler: () => {
-            deleteData(keyToDelete, uuid);
-            setShowToast(true);
-          },
+          handler: () => deleteData(keyToDelete, uuid),
         },
       ]}
-    >
-      <IonToast
-        isOpen={showToast}
-        onDidDismiss={() => setShowToast(false)}
-        message="Данные удалены! Пожалуйста, обновите данные."
-        duration={2000}
-      />
-    </IonActionSheet>
+    ></IonActionSheet>
   );
 };
 export default ActionSheet;

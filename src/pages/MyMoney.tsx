@@ -17,24 +17,13 @@ import {
   IonSegmentButton,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import {
-  add,
-  cashOutline,
-  refresh,
-  trashBin,
-  trendingDown,
-  trendingUp,
-  wallet,
-} from "ionicons/icons";
+import { add, refresh, trendingDown, trendingUp, wallet } from "ionicons/icons";
 import { RefresherEventDetail } from "@ionic/core";
 import ExploreContainer from "../components/ExploreContainer";
-import "./Tab1.css";
 import { AddDataModal } from "../components/addDataModal";
-import { Plugins } from "@capacitor/core";
 import DataArray from "../components/interfaces";
 import ActionSheet from "../components/ActionSheet";
-import { keys } from "../components/storage";
-const { Storage } = Plugins;
+import { getItem, keys } from "../components/storage";
 
 const MyMoney: React.FC = () => {
   const [showState, setShowState] = useState(false);
@@ -44,20 +33,11 @@ const MyMoney: React.FC = () => {
   const [keysData, setKeysData] = useState<Array<string>>([]);
   const [parsedData, setParsedData] = useState<Array<DataArray>>([]);
 
-  async function getItem(key: string) {
-    const { value } = await Storage.get({ key: key });
-    console.log({ key: key, value: JSON.parse(String(value)) });
-    if (typeof value === "string") {
-      return JSON.parse(String(value)).data;
-    }
-    return null;
-  }
-
   async function getItems(keys: Array<string>) {
     var data: Array<DataArray> = [];
     for (var i = 0; i < keys.length; i++) {
-      var a: Array<DataArray> | null = await getItem(keys[i]);
-      if (a !== null) {
+      var a: Array<DataArray> = await getItem(keys[i]);
+      if (a.length > 0) {
         if (getType === "Доходы") {
           for (let j = 0; j < a.length; j++) {
             const element = a[j];
@@ -80,11 +60,6 @@ const MyMoney: React.FC = () => {
     setParsedData(data);
   }
 
-  async function clear() {
-    await Storage.clear();
-    console.log("Storage Cleared");
-  }
-
   function doRefresh(event: CustomEvent<RefresherEventDetail>) {
     keys(setKeysData).finally(() =>
       getItems(keysData).finally(() => event.detail.complete())
@@ -93,12 +68,12 @@ const MyMoney: React.FC = () => {
 
   function doRefreshGo() {
     keys(setKeysData).finally(() => getItems(keysData));
-  }
-
+  }  
+  
   useEffect(() => {
     doRefreshGo();
-  }, [getType]);
-
+  }, [getType, showActionSheet, showState]);
+  
   return (
     <IonPage>
       <IonHeader>
@@ -158,14 +133,27 @@ const MyMoney: React.FC = () => {
         {parsedData
           ? parsedData.map((data, i) => {
               return (
-                <IonItem key={i} onClick={() => {setShowActionSheet(data.uuid)}}>
+                <IonItem
+                  key={i}
+                  onClick={() => {
+                    setShowActionSheet(data.uuid);
+                    setTimeout(() => {
+                      doRefreshGo();
+                    }, 3000);
+                  }}
+                >
                   <IonLabel slot="start">
                     <h2>{data.type}</h2>
                     <h3>{data.description}</h3>
                     <p>{data.date}</p>
                   </IonLabel>
                   <IonLabel>{data.value} р.</IonLabel>
-                  <ActionSheet setShowActionSheet={setShowActionSheet} showActionSheet={showActionSheet} uuid={data.uuid} keyToDelete={data.date}></ActionSheet>
+                  <ActionSheet
+                    setShowActionSheet={setShowActionSheet}
+                    showActionSheet={showActionSheet}
+                    uuid={data.uuid}
+                    keyToDelete={data.date}
+                  ></ActionSheet>
                 </IonItem>
               );
             })
@@ -192,9 +180,6 @@ const MyMoney: React.FC = () => {
             }}
           >
             <IonIcon icon={trendingUp} />
-          </IonFabButton>
-          <IonFabButton onClick={() => clear()}>
-            <IonIcon icon={trashBin} />
           </IonFabButton>
         </IonFabList>
       </IonFab>

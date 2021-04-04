@@ -41,7 +41,6 @@ async function setItem(
   var dateStamp = dd + "." + mm + "." + yyyy;
   var oldData = await getItem(dateStamp);
   if (oldData.length > 0) {
-    console.log(oldData)
     await Storage.set({
       key: dateStamp,
       value: JSON.stringify({
@@ -115,4 +114,9 @@ async function deleteData(key: string, uuid: string) {
   updateItem(key, data)
 }
 
-export { keys, deleteData, setItem, getItem };
+async function clearStorage() {
+  await Storage.clear();
+  console.log("Storage Cleared");
+}
+
+export { keys, deleteData, setItem, getItem, clearStorage };
