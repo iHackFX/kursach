@@ -17,7 +17,7 @@ import {
   PieChart,
 } from "../components/chart";
 import { Plugins } from "@capacitor/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Tab3.css";
 const { Storage } = Plugins;
 
@@ -46,13 +46,13 @@ const Tab3: React.FC = () => {
   
   async function keys() {
     const { keys } = await Storage.keys();
-    console.log({ "Storage KEYS: ": keys });
+    // console.log({ "Storage KEYS: ": keys });
     setKeysData(keys);
   }
 
   async function getItem(key: string) {
     const { value } = await Storage.get({ key: key });
-    console.log({ key: key, value: JSON.parse(String(value)) });
+    // console.log({ key: key, value: JSON.parse(String(value)) });
     return value;
   }
 
@@ -73,8 +73,11 @@ const Tab3: React.FC = () => {
 
   function doRefreshGo() {
     keys().finally(() => getItems(keysData));
-    
   }
+
+  useEffect(() => {
+    doRefreshGo();
+  }, [true]);
 
   return (
     <IonPage>

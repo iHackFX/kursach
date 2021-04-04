@@ -13,8 +13,10 @@ import {
   IonItem,
   IonButton,
   IonLabel,
+  IonSegment,
+  IonSegmentButton,
 } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   add,
   cashOutline,
@@ -29,6 +31,7 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./Tab1.css";
 import { AddDataModal } from "../components/addDataModal";
 import { Plugins } from "@capacitor/core";
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from "node:constants";
 interface DataArray {
   date: string;
   type: string;
@@ -40,28 +43,48 @@ const { Storage } = Plugins;
 const MyMoney: React.FC = () => {
   const [showState, setShowState] = useState(false);
   const [data, setData] = useState("");
+  const [getType, setGetType] = useState("Всё");
   const [keysData, setKeysData] = useState<Array<string>>([]);
   const [parsedData, setParsedData] = useState<Array<DataArray>>([]);
-
   async function keys() {
     const { keys } = await Storage.keys();
-    console.log({ "Storage KEYS: ": keys });
+    // console.log({ "Storage KEYS: ": keys });
     setKeysData(keys);
   }
 
   async function getItem(key: string) {
     const { value } = await Storage.get({ key: key });
-    console.log({ key: key, value: JSON.parse(String(value)) });
-    return value;
+    // console.log({ key: key, value: JSON.parse(String(value)).data });
+    if (typeof value === "string") {
+      return JSON.parse(String(value)).data;
+    }
+    return null;
   }
 
   async function getItems(keys: Array<string>) {
     var data: Array<DataArray> = [];
     for (var i = 0; i < keys.length; i++) {
-      var a = await getItem(keys[i]);
-      data.push(...JSON.parse(String(a)).data);
+      var a: Array<DataArray> | null = await getItem(keys[i]);
+      if (a !== null) {
+        if (getType === "Доходы") {
+          for (let j = 0; j < a.length; j++) {
+            const element = a[j];
+            if (element.type === "Доход") {
+              data.push(element);
+            }
+          }
+        } else if (getType === "Расходы") {
+          for (let j = 0; j < a.length; j++) {
+            const element = a[j];
+            if (element.type === "Расход") {
+              data.push(element);
+            }
+          }
+        } else {
+          data.push(...a);
+        }
+      }
     }
-    // console.log(data);
     setParsedData(data);
   }
 
@@ -79,6 +102,10 @@ const MyMoney: React.FC = () => {
   function doRefreshGo() {
     keys().finally(() => getItems(keysData));
   }
+
+  useEffect(() => {
+    doRefreshGo();
+  }, [getType]);
 
   return (
     <IonPage>
@@ -100,6 +127,22 @@ const MyMoney: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
+        <IonSegment
+          onIonChange={(e) => {
+            setGetType(e.detail.value as string);
+          }}
+          value={getType}
+        >
+          <IonSegmentButton value="Всё">
+            <IonLabel>Всё</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="Доходы">
+            <IonLabel>Доходы</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="Расходы">
+            <IonLabel>Расходы</IonLabel>
+          </IonSegmentButton>
+        </IonSegment>
         <IonRefresher slot="fixed" onIonRefresh={doRefresh}>
           <IonRefresherContent
             refreshingText={"Если ничего не появилось, попробуйте снова"}
