@@ -9,7 +9,11 @@ import {
   IonTabs,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { pieChartOutline, settingsOutline, walletOutline } from "ionicons/icons";
+import {
+  pieChartOutline,
+  settingsOutline,
+  walletOutline,
+} from "ionicons/icons";
 import MyMoney from "./pages/MyMoney";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
@@ -32,43 +36,48 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
+import StartPage from "./components/StartPage";
+import { useState } from "react";
 
-
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/my-money">
-            <MyMoney />
-          </Route>
-          <Route exact path="/statistics">
-            <Statistics />
-          </Route>
-          <Route path="/settings">
-            <Settings />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/my-money" />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="myMoney" href="/my-money">
-            <IonIcon icon={walletOutline} />
-            <IonLabel>Мои деньги</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="statistics" href="/statistics">
-            <IonIcon icon={pieChartOutline} />
-            <IonLabel>Статистика</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="settings" href="/settings">
-            <IonIcon icon={settingsOutline} />
-            <IonLabel>Настройки</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const [showStartPage, setShowStartPage] = useState(true);
+  return (
+    <IonApp>
+      <StartPage setShowModal={setShowStartPage} showModal={showStartPage} />
+      <IonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/my-money">
+              <MyMoney showStartPage={showStartPage} />
+            </Route>
+            <Route exact path="/statistics">
+              <Statistics />
+            </Route>
+            <Route path="/settings">
+              <Settings />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/my-money" />
+            </Route>
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="myMoney" href="/my-money">
+              <IonIcon icon={walletOutline} />
+              <IonLabel>Мои деньги</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="statistics" href="/statistics">
+              <IonIcon icon={pieChartOutline} />
+              <IonLabel>Статистика</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="settings" href="/settings">
+              <IonIcon icon={settingsOutline} />
+              <IonLabel>Настройки</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

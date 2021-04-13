@@ -25,7 +25,11 @@ import DataArray from "../components/interfaces";
 import ActionSheet from "../components/ActionSheet";
 import { getItem, keys } from "../components/storage";
 
-const MyMoney: React.FC = () => {
+interface MyMoney{
+  showStartPage: boolean;
+}
+
+const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
   const [showState, setShowState] = useState(false);
   const [data, setData] = useState("");
   const [getType, setGetType] = useState("Всё");
@@ -72,7 +76,7 @@ const MyMoney: React.FC = () => {
   
   useEffect(() => {
     doRefreshGo();
-  }, [getType, showActionSheet, showState]);
+  }, [getType, showActionSheet, showState, showStartPage]);
   
   return (
     <IonPage>
@@ -126,7 +130,7 @@ const MyMoney: React.FC = () => {
           typeOfData={data}
         />
         {parsedData.length < 1 ? (
-          <ExploreContainer name="Данных пока нет, попробуйте добавить новые или загрузите данные пару раз потянув пальцем вниз" />
+          <ExploreContainer name="Данных пока нет, попробуйте добавить новые или загрузите данные, потянув пальцем вниз" />
         ) : (
           ""
         )}
