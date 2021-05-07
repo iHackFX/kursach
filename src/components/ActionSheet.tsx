@@ -26,7 +26,7 @@ const ActionSheet: React.FC<ActionProps> = ({
           text: "Удалить",
           role: "destructive",
           icon: trash,
-          handler: () => deleteData(keyToDelete, uuid),
+          handler: () => deleteData(uuid),
         },
       ]}
     ></IonActionSheet>

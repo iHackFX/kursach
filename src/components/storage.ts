@@ -25,6 +25,7 @@ async function setItem(
   date: string,
   type: string,
   typeOfData: string = "",
+  typeT: string | null = null,
   value: string,
   description: string | null = null
 ) {
@@ -39,10 +40,10 @@ async function setItem(
   var mm = String(dateValue.getMonth() + 1).padStart(2, "0"); //January is 0!
   var yyyy = dateValue.getFullYear();
   var dateStamp = dd + "." + mm + "." + yyyy;
-  var oldData = await getItem(dateStamp);
+  var oldData = await getItem("data");
   if (oldData.length > 0) {
     await Storage.set({
-      key: dateStamp,
+      key: "data",
       value: JSON.stringify({
         data: [
           ...oldData,
@@ -50,6 +51,7 @@ async function setItem(
             uuid: uuid(),
             date: dateStamp,
             type: type,
+            typeT: typeT,
             value: value,
             description: description,
           },
@@ -58,13 +60,14 @@ async function setItem(
     });
   } else {
     await Storage.set({
-      key: dateStamp,
+      key: "data",
       value: JSON.stringify({
         data: [
           {
             uuid: uuid(),
             date: dateStamp,
             type: type,
+            typeT: typeT,
             value: value,
             description: description,
           },
@@ -103,15 +106,15 @@ async function getItem(key: string) {
   return [];
 }
 
-async function deleteData(key: string, uuid: string) {
-  var data: Array<DataArray> = await getItem(key);
+async function deleteData(uuid: string) {
+  var data: Array<DataArray> = await getItem("data");
   for (var i = 0; i < data.length; i++) {
     if (data[i].uuid === uuid) {
       data.splice(i, 1);
       break;
     }
   }
-  updateItem(key, data)
+  updateItem("data", data)
 }
 
 async function clearStorage() {

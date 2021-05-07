@@ -18,7 +18,7 @@ import {
 } from "@ionic/react";
 import { close } from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { setItem } from "../components/storage";
 const { Storage } = Plugins;
 
@@ -40,8 +40,13 @@ export const AddDataModal: React.FC<HomeProps> = ({
 }) => {
   const [dateValue, setDate] = useState("");
   const [typeValue, setType] = useState("");
+  const [typeT, setTypeT] = useState("");
   const [moneyValue, setMoney] = useState("");
   const [description, setDescription] = useState("");
+  useEffect(() => {
+    setType(typeOfData);
+    setTypeT("Прочее");
+  }, [showState]);
 
   return (
     <IonModal isOpen={showState} onDidDismiss={() => setShowState(false)}>
@@ -60,7 +65,7 @@ export const AddDataModal: React.FC<HomeProps> = ({
           <IonItem>
             <IonLabel>Тип данных</IonLabel>
             <IonSelect
-              value={typeValue.length < 3 ? typeOfData : typeValue}
+              value={typeValue}
               onIonChange={(e) => {
                 setType(String(e.detail.value));
               }}
@@ -69,6 +74,37 @@ export const AddDataModal: React.FC<HomeProps> = ({
               <IonSelectOption value="Расход">Расход</IonSelectOption>
             </IonSelect>
           </IonItem>
+          {typeValue == "Расход" ? (
+            <IonItem>
+              <IonLabel>Тип Расходов</IonLabel>
+              <IonSelect
+                onIonChange={(e) => {
+                  setTypeT(String(e.detail.value));
+                }}
+                value={typeT}
+              >
+                <IonSelectOption value="Супермаркеты">
+                  Супермаркеты
+                </IonSelectOption>
+                <IonSelectOption value="Всё для дома">
+                  Всё для дома
+                </IonSelectOption>
+                <IonSelectOption value="Услуги связи">
+                  Услуги связи
+                </IonSelectOption>
+                <IonSelectOption value="Одежда и аксессуары">
+                  Одежда и аксессуары
+                </IonSelectOption>
+                <IonSelectOption value="Рестораны и кафе">
+                  Рестораны и кафе
+                </IonSelectOption>
+                <IonSelectOption value="Транспорт">Транспорт</IonSelectOption>
+                <IonSelectOption value="Прочее">Прочее</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+          ) : (
+            ""
+          )}
           <IonItem>
             <IonLabel>Дата</IonLabel>
             <IonDatetime
@@ -89,9 +125,7 @@ export const AddDataModal: React.FC<HomeProps> = ({
             ></IonInput>
           </IonItem>
           <IonItem>
-            <IonLabel position="floating">
-              Описание
-            </IonLabel>
+            <IonLabel position="floating">Описание</IonLabel>
             <IonTextarea
               value={description}
               onIonChange={(e) => setDescription(e.detail.value!)}
@@ -103,13 +137,25 @@ export const AddDataModal: React.FC<HomeProps> = ({
         type="submit"
         color="success"
         onClick={() => {
-          setItem(
-            dateValue,
-            typeValue,
-            typeOfData,
-            moneyValue,
-            description
-          ).finally(() => setShowState(false));
+          if (typeValue === "Доход"){
+            setItem(
+              dateValue,
+              typeValue,
+              typeOfData,
+              "",
+              moneyValue,
+              description
+            ).finally(() => setShowState(false));
+          }else{
+            setItem(
+              dateValue,
+              typeValue,
+              typeOfData,
+              typeT,
+              moneyValue,
+              description
+            ).finally(() => setShowState(false));
+          }
         }}
         disabled={moneyValue ? false : true}
       >

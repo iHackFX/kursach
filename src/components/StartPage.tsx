@@ -7,7 +7,7 @@ import {
   IonList,
   IonModal,
 } from "@ionic/react";
-import { CSSProperties, SetStateAction } from "react";
+import React, { CSSProperties, SetStateAction } from "react";
 
 interface StartPage {
   showModal: boolean;
@@ -22,13 +22,11 @@ const StartPage: React.FC<StartPage> = ({ showModal, setShowModal }) => {
   return (
     <IonModal isOpen={showModal} cssClass="my-custom-class">
       <IonContent>
-        <IonList>
-          <IonItem>
-            <h1 style={textCenter}>
-              Добро пожаловать в приложение по учету ваших расходов и доходов
-            </h1>
-          </IonItem>
-        </IonList>
+        <h1 style={
+          {
+            textAlign: "center"
+          }
+        }>Добро пожаловать в приложение по учету ваших расходов и доходов</h1>
         <IonFab
           vertical="center"
           horizontal="center"

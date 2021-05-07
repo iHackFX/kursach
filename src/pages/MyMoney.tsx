@@ -147,8 +147,19 @@ const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
                   }}
                 >
                   <IonLabel slot="start">
-                    <h2>{data.type}</h2>
-                    <h3>{data.description}</h3>
+                  <h2>{data.type}</h2>
+                    {data.description != undefined &&
+                    data.description.length > 1 ? (
+                      <h3>Описание: {data.description}</h3>
+                    ) : (
+                      ""
+                    )}
+                    {console.log(data.description)}
+                    {data.typeT != undefined && data.typeT.length > 1 ? (
+                      <h3>Тип: {data.typeT}</h3>
+                    ) : (
+                      ""
+                    )}
                     <p>{data.date}</p>
                   </IonLabel>
                   <IonLabel>{data.value} р.</IonLabel>

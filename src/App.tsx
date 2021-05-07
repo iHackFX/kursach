@@ -16,7 +16,7 @@ import {
 } from "ionicons/icons";
 import MyMoney from "./pages/MyMoney";
 import Settings from "./pages/Settings";
-import Statistics from "./pages/Statistics";
+import Statistics from "./pages/Stat";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";

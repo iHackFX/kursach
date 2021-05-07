@@ -60,7 +60,7 @@ export const PieChart: React.FC<LineChartProps> = ({
       ],
     };
   }
-  return <Pie data={graphData} height={450} />;
+  return <Pie data={graphData} height={300} />;
 };
 
 export const LineChart: React.FC<LineChartProps> = ({
