@@ -1,24 +1,27 @@
-import { Plugins } from "@capacitor/core";
+import {
+  Plugins,
+  FilesystemDirectory,
+  FilesystemEncoding,
+} from "@capacitor/core";
 import React from "react";
 import DataArray from "./interfaces";
-const { Storage } = Plugins;
+import { isPlatform } from "@ionic/react";
+import { FileChooser } from "@ionic-native/file-chooser";
+
+const { Filesystem, Storage } = Plugins;
 
 var today = new Date();
 var dd = String(today.getDate()).padStart(2, "0");
 var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
 var yyyy = today.getFullYear();
-
 const nowDate = yyyy.toString() + "-" + mm.toString() + "-" + dd.toString();
 
 function uuid() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-    /[xy]/g,
-    function (c) {
-      var r = (Math.random() * 16) | 0,
-        v = c == "x" ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    }
-  );
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 async function setItem(
@@ -77,15 +80,13 @@ async function setItem(
   }
 }
 
-async function updateItem(key: string, DataArray: Array<DataArray>){
-  await Storage.set(
-    {
-      key: key,
-      value: JSON.stringify({
-        data: DataArray
-      }),
-    }
-  )
+async function updateItem(key: string, DataArray: Array<DataArray> | boolean) {
+  await Storage.set({
+    key: key,
+    value: JSON.stringify({
+      data: DataArray,
+    }),
+  });
 }
 
 async function keys(
@@ -99,7 +100,6 @@ async function keys(
 
 async function getItem(key: string) {
   const { value } = await Storage.get({ key: key });
-  console.log({ key: key, value: JSON.parse(String(value)) });
   if (typeof value === "string") {
     return JSON.parse(String(value)).data;
   }
@@ -114,7 +114,7 @@ async function deleteData(uuid: string) {
       break;
     }
   }
-  updateItem("data", data)
+  updateItem("data", data);
 }
 
 async function clearStorage() {
@@ -122,4 +122,57 @@ async function clearStorage() {
   console.log("Storage Cleared");
 }
 
-export { keys, deleteData, setItem, getItem, clearStorage };
+async function exportData() {
+  var data: Array<DataArray> = await getItem("data");
+  if (isPlatform("capacitor")) {
+    try {
+      const result = await Filesystem.writeFile({
+        path: "exportedData-" + new Date().toDateString() + ".json",
+        data: JSON.stringify({ data: [...data] }),
+        directory: FilesystemDirectory.Documents,
+        encoding: FilesystemEncoding.UTF8,
+      });
+      
+    } catch (e) {
+      console.error("Error: ", e);
+    }
+  } else if (isPlatform("desktop")) {
+    var file = document.createElement("a");
+    file.setAttribute(
+      "href",
+      "data:application/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify({ data: [...data] }))
+    );
+    file.setAttribute("download", "exportedData-" + String(new Date()));
+    file.click();
+  }
+}
+
+async function importData() {
+  if (isPlatform("android")) {
+    try {
+      let dataPath = await FileChooser.open();
+      let result = await Filesystem.readFile({
+        path: dataPath,
+        encoding: FilesystemEncoding.UTF8,
+      });
+      updateItem("data", JSON.parse(result.data).data);
+    } catch (e) {
+      console.error(e);
+    }
+  } else if (isPlatform("desktop")) {
+    // TODO:Сделать импорт и для ПК версии
+    console.error("Пока не работает");
+  }
+}
+
+export {
+  keys,
+  deleteData,
+  setItem,
+  getItem,
+  updateItem,
+  clearStorage,
+  exportData,
+  importData,
+};

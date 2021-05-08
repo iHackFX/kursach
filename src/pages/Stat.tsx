@@ -9,8 +9,6 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonSegment,
-  IonSegmentButton,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -21,7 +19,6 @@ import {
   call,
   ellipsisHorizontal,
   home,
-  phonePortrait,
   pieChartOutline,
   refresh,
   restaurant,
@@ -31,7 +28,6 @@ import { useEffect, useState } from "react";
 import { keys, getItem } from "../components/storage";
 import DataArray from "../components/interfaces";
 import ExploreContainer from "../components/ExploreContainer";
-import { parse } from "node:path";
 
 function random(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -41,7 +37,6 @@ const Tab3: React.FC = () => {
   const [getType, setGetType] = useState("Всё");
   const [keysData, setKeysData] = useState<Array<string>>([]);
   const [parsedData, setParsedData] = useState<Array<number>>([]);
-  const [parsedLegend, setParsedLegend] = useState<Array<string>>([]);
   var defaultData = [];
   for (var i = 0; i < 15; i++) {
     defaultData.push(random(3000));
@@ -56,7 +51,6 @@ const Tab3: React.FC = () => {
         switch (el.typeT) {
           case 'Супермаркеты':
             arrayOfValues[0] += parseInt(el.value);
-            console.log(0);
             break;
           case 'Всё для дома':
             arrayOfValues[1] += parseInt(el.value);

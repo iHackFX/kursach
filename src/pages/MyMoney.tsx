@@ -154,7 +154,6 @@ const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
                     ) : (
                       ""
                     )}
-                    {console.log(data.description)}
                     {data.typeT != undefined && data.typeT.length > 1 ? (
                       <h3>Тип: {data.typeT}</h3>
                     ) : (

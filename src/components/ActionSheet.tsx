@@ -1,6 +1,6 @@
-import { IonActionSheet, IonToast } from "@ionic/react";
-import { information, trash } from "ionicons/icons";
-import React, { SetStateAction, useState } from "react";
+import { IonActionSheet } from "@ionic/react";
+import { trash } from "ionicons/icons";
+import React, { SetStateAction } from "react";
 import { deleteData } from "./storage";
 
 interface ActionProps {

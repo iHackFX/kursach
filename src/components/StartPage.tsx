@@ -2,9 +2,6 @@ import {
   IonButton,
   IonContent,
   IonFab,
-  IonFabButton,
-  IonItem,
-  IonList,
   IonModal,
 } from "@ionic/react";
 import React, { CSSProperties, SetStateAction } from "react";

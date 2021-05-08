@@ -37,10 +37,22 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import StartPage from "./components/StartPage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getItem } from "./components/storage";
 
 const App: React.FC = () => {
   const [showStartPage, setShowStartPage] = useState(true);
+  async function darkThemeCheck() {
+    let darkTheme = await getItem("darkTheme");
+    if (darkTheme === true){
+      document.body.setAttribute("color-theme", "dark");
+    }else{
+      document.body.setAttribute("color-theme", "light");
+    }
+  }
+  useEffect(() => {
+    darkThemeCheck();
+  });
   return (
     <IonApp>
       <StartPage setShowModal={setShowStartPage} showModal={showStartPage} />

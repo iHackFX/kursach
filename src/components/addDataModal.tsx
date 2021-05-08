@@ -17,10 +17,8 @@ import {
   IonTextarea,
 } from "@ionic/react";
 import { close } from "ionicons/icons";
-import { Plugins } from "@capacitor/core";
 import { useEffect, useState } from "react";
 import { setItem } from "../components/storage";
-const { Storage } = Plugins;
 
 interface HomeProps {
   showState: any;
