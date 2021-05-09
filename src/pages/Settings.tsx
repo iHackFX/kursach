@@ -1,4 +1,4 @@
-import { FilesystemDirectory } from "@capacitor/core";
+import { FilesystemDirectory, Toast } from "@capacitor/core";
 import {
   IonContent,
   IonHeader,
@@ -21,18 +21,26 @@ import {
   trash,
 } from "ionicons/icons";
 import { useState } from "react";
-import { clearStorage, exportData, importData, updateItem } from "../components/storage";
+import {
+  clearStorage,
+  exportData,
+  importData,
+  updateItem,
+} from "../components/storage";
 
 const Settings: React.FC = () => {
   const [showToast, setShowToast] = useState("");
   const [theme, setTheme] = useState(
     document.body.getAttribute("color-theme") === "dark"
   );
+  /**
+   * Смена тёмной темы
+   */
   function toggleDarkMode() {
     if (document.body.getAttribute("color-theme") !== "dark") {
       document.body.setAttribute("color-theme", "dark");
       setTheme(true);
-      updateItem("darkTheme", true)
+      updateItem("darkTheme", true);
     } else {
       document.body.setAttribute("color-theme", "light");
       setTheme(false);

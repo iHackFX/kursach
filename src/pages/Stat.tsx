@@ -73,21 +73,15 @@ const Tab3: React.FC = () => {
     setParsedData(arrayOfValues);
   }
 
-  function doRefresh(event: CustomEvent<RefresherEventDetail>) {
-    keys(setKeysData).finally(() =>
-      getItems().finally(() => event.detail.complete())
-    );
-  }
-
-  function doRefreshGo() {
+  function doRefresh(event?: CustomEvent<RefresherEventDetail>) {
     keys(setKeysData).finally(() => {
       keysData.reverse();
-      getItems();
+      getItems().finally(() => event?.detail.complete())
     });
   }
 
   useEffect(() => {
-    doRefreshGo();
+    doRefresh();
   }, [getType]);
 
   return (
@@ -103,7 +97,7 @@ const Tab3: React.FC = () => {
             shape="round"
             slot="end"
             size="small"
-            onClick={doRefreshGo}
+            onClick={() => doRefresh()}
           >
             <IonIcon icon={refresh} />
           </IonButton>

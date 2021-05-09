@@ -15,69 +15,113 @@ import {
   IonLabel,
   IonSegment,
   IonSegmentButton,
+  isPlatform,
+  IonToast,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { add, refresh, trendingDown, trendingUp, wallet } from "ionicons/icons";
+import {
+  add,
+  qrCode,
+  refresh,
+  trendingDown,
+  trendingUp,
+  wallet,
+} from "ionicons/icons";
 import { RefresherEventDetail } from "@ionic/core";
 import ExploreContainer from "../components/ExploreContainer";
 import { AddDataModal } from "../components/addDataModal";
 import DataArray from "../components/interfaces";
 import ActionSheet from "../components/ActionSheet";
-import { getItem, keys } from "../components/storage";
+import { getItemsByType, keys } from "../components/storage";
+import {
+  BarcodeScanner,
+  BarcodeScannerOriginal,
+  BarcodeScanResult,
+} from "@ionic-native/barcode-scanner";
+import { Toast } from "@capacitor/core";
 
-interface MyMoney{
+interface MyMoney {
   showStartPage: boolean;
 }
+interface ToastData {
+  show: boolean;
+  text: string;
+  duration: number;
+}
 
-const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
+const MyMoney: React.FC<MyMoney> = ({ showStartPage }) => {
   const [showState, setShowState] = useState(false);
   const [data, setData] = useState("");
   const [getType, setGetType] = useState("Всё");
   const [showActionSheet, setShowActionSheet] = useState("");
+  const [moneyValue, setMoney] = useState("");
+  const [dateValue, setDate] = useState("");
   const [keysData, setKeysData] = useState<Array<string>>([]);
   const [parsedData, setParsedData] = useState<Array<DataArray>>([]);
+  const [toastData, setToastData] = useState<ToastData>();
 
-  async function getItems(keys: Array<string>) {
-    var data: Array<DataArray> = [];
-    for (var i = 0; i < keys.length; i++) {
-      var a: Array<DataArray> = await getItem(keys[i]);
-      if (a.length > 0) {
-        if (getType === "Доходы") {
-          for (let j = 0; j < a.length; j++) {
-            const element = a[j];
-            if (element.type === "Доход") {
-              data.push(element);
-            }
-          }
-        } else if (getType === "Расходы") {
-          for (let j = 0; j < a.length; j++) {
-            const element = a[j];
-            if (element.type === "Расход") {
-              data.push(element);
-            }
-          }
-        } else {
-          data.push(...a);
-        }
-      }
-    }
-    setParsedData(data);
-  }
-
-  function doRefresh(event: CustomEvent<RefresherEventDetail>) {
+  /**
+   * Обновление данных
+   * @param event Возвращаемый event от IonicRefresher
+   */
+  function doRefresh(event?: CustomEvent<RefresherEventDetail>) {
     keys(setKeysData).finally(() =>
-      getItems(keysData).finally(() => event.detail.complete())
+      getItemsByType(keysData, getType, setParsedData).finally(() =>
+        event?.detail.complete()
+      )
     );
   }
 
-  function doRefreshGo() {
-    keys(setKeysData).finally(() => getItems(keysData));
-  }  
-  
+  /**
+   * Добавление данных с помощью QR кода
+   */
+  async function qrCodeAdd() {
+    try {
+      var qrData = await (await BarcodeScanner.scan()).text;
+      console.log(qrData);
+    } catch (e) {
+      if (isPlatform("desktop")) {
+        // тестовые данные для неправильных значений
+        var qrData =
+          "t=20180518T220500&s=975.88&fn=8710000101125654&i=99456&fp=1250448795&n=1";
+        throw "Не поддерживается Desktop(web)";
+      } else {
+        throw e;
+      }
+    }
+    var data = new URLSearchParams(qrData);
+    if (!(data.has("t") && data.has("s"))) {
+      throw "Неверный QR код";
+    }
+    var timeVal =
+      data.has("t")
+        ? (() => {
+            let t = data.get("t");
+            return (
+              t?.slice(0, 4) +
+              "-" +
+              t?.slice(4, 6) +
+              "-" +
+              t?.slice(6, 11) +
+              ":" +
+              t?.slice(11, 13)
+            );
+          })()
+        : ""; // Страшна
+    console.log(timeVal);
+    var time = new Date(Date.parse(timeVal) || Date.now()).toDateString();
+    console.log(time);
+    var sum = data.get("s")?.toString() || "";
+    setDate(time);
+    setMoney(sum);
+    setData("Расход");
+    setShowState(true);
+  }
+
   useEffect(() => {
-    doRefreshGo();
+    doRefresh();
   }, [getType, showActionSheet, showState, showStartPage]);
-  
+
   return (
     <IonPage>
       <IonHeader>
@@ -91,7 +135,7 @@ const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
             shape="round"
             slot="end"
             size="small"
-            onClick={doRefreshGo}
+            onClick={() => doRefresh()}
           >
             <IonIcon icon={refresh} />
           </IonButton>
@@ -128,6 +172,8 @@ const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
           setShowState={setShowState}
           showState={showState}
           typeOfData={data}
+          money={moneyValue.length > 1 ? moneyValue : undefined}
+          date={dateValue.length > 1 ? dateValue : undefined}
         />
         {parsedData.length < 1 ? (
           <ExploreContainer name="Данных пока нет, попробуйте добавить новые или загрузите данные, потянув пальцем вниз" />
@@ -142,12 +188,12 @@ const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
                   onClick={() => {
                     setShowActionSheet(data.uuid);
                     setTimeout(() => {
-                      doRefreshGo();
+                      doRefresh();
                     }, 3000);
                   }}
                 >
                   <IonLabel slot="start">
-                  <h2>{data.type}</h2>
+                    <h2>{data.type}</h2>
                     {data.description != undefined &&
                     data.description.length > 1 ? (
                       <h3>Описание: {data.description}</h3>
@@ -189,6 +235,19 @@ const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
           </IonFabButton>
           <IonFabButton
             onClick={() => {
+              qrCodeAdd().catch((e) => {
+                setToastData({
+                  show: true,
+                  text: e,
+                  duration: 1000,
+                });
+              });
+            }}
+          >
+            <IonIcon icon={qrCode} />
+          </IonFabButton>
+          <IonFabButton
+            onClick={() => {
               setData("Доход");
               setShowState(true);
             }}
@@ -197,6 +256,14 @@ const MyMoney: React.FC<MyMoney> = ({showStartPage}) => {
           </IonFabButton>
         </IonFabList>
       </IonFab>
+      <IonToast
+        isOpen={toastData?.show ? toastData.show : false}
+        message={toastData?.text ? toastData.text : ""}
+        duration={toastData?.duration ? toastData.duration : 0}
+        onDidDismiss={() => {
+          setToastData({ show: false } as ToastData);
+        }}
+      />
     </IonPage>
   );
 };

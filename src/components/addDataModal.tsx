@@ -24,6 +24,8 @@ interface HomeProps {
   showState: any;
   setShowState: any;
   typeOfData: string;
+  money?: string;
+  date?: string;
 }
 var today = new Date();
 var dd = String(today.getDate()).padStart(2, "0");
@@ -35,6 +37,8 @@ export const AddDataModal: React.FC<HomeProps> = ({
   showState,
   setShowState,
   typeOfData,
+  money = null,
+  date = null
 }) => {
   const [dateValue, setDate] = useState("");
   const [typeValue, setType] = useState("");
@@ -42,8 +46,11 @@ export const AddDataModal: React.FC<HomeProps> = ({
   const [moneyValue, setMoney] = useState("");
   const [description, setDescription] = useState("");
   useEffect(() => {
+    setDate(date ? date : nowDate);
     setType(typeOfData);
     setTypeT("Прочее");
+    setMoney(money ? money : "");
+    setDescription("");
   }, [showState]);
 
   return (
@@ -118,6 +125,7 @@ export const AddDataModal: React.FC<HomeProps> = ({
               Введи количество денег (руб)
             </IonLabel>
             <IonInput
+              value ={moneyValue}
               type="number"
               onIonChange={(e) => setMoney(String(e.detail.value))}
             ></IonInput>
@@ -139,8 +147,6 @@ export const AddDataModal: React.FC<HomeProps> = ({
             setItem(
               dateValue,
               typeValue,
-              typeOfData,
-              "",
               moneyValue,
               description
             ).finally(() => setShowState(false));
@@ -148,10 +154,9 @@ export const AddDataModal: React.FC<HomeProps> = ({
             setItem(
               dateValue,
               typeValue,
-              typeOfData,
-              typeT,
               moneyValue,
-              description
+              description,
+              typeT
             ).finally(() => setShowState(false));
           }
         }}

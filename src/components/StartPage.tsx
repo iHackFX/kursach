@@ -4,15 +4,11 @@ import {
   IonFab,
   IonModal,
 } from "@ionic/react";
-import React, { CSSProperties, SetStateAction } from "react";
+import React, { SetStateAction } from "react";
 
 interface StartPage {
   showModal: boolean;
   setShowModal: React.Dispatch<SetStateAction<boolean>>;
-}
-
-const textCenter : CSSProperties = { 
-  textAlign: 'center',
 }
 
 const StartPage: React.FC<StartPage> = ({ showModal, setShowModal }) => {

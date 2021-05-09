@@ -16,7 +16,11 @@ var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
 var yyyy = today.getFullYear();
 const nowDate = yyyy.toString() + "-" + mm.toString() + "-" + dd.toString();
 
-function uuid() {
+/**
+ * Функция для генерации UUID
+ * @returns Сгенерированный UUID
+ */
+function uuid() : string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
       v = c == "x" ? r : (r & 0x3) | 0x8;
@@ -24,17 +28,22 @@ function uuid() {
   });
 }
 
+
+/**
+ * Запись в базу данных
+ * @param date Дата записи
+ * @param type Тип записи ("Расход", "Доход")
+ * @param value Количество денег
+ * @param description Описание записи
+ * @param typeT Вид "Расхода" записи
+ */
 async function setItem(
   date: string,
   type: string,
-  typeOfData: string = "",
-  typeT: string | null = null,
   value: string,
-  description: string | null = null
+  description: string = "",
+  typeT?: string,
 ) {
-  if (type.length < 3) {
-    type = typeOfData;
-  }
   if (date.length < 3) {
     date = nowDate;
   }
@@ -80,6 +89,11 @@ async function setItem(
   }
 }
 
+/**
+ * Обновление записи в базе данных
+ * @param key Ключ для обновления
+ * @param DataArray Массив данных
+ */
 async function updateItem(key: string, DataArray: Array<DataArray> | boolean) {
   await Storage.set({
     key: key,
@@ -89,6 +103,10 @@ async function updateItem(key: string, DataArray: Array<DataArray> | boolean) {
   });
 }
 
+/**
+ * Получение возможных ключей
+ * @param setKeysData UseState Set-функция куда записывать данные
+ */
 async function keys(
   setKeysData: React.Dispatch<React.SetStateAction<string[]>>
 ) {
@@ -98,7 +116,12 @@ async function keys(
   setKeysData(keys);
 }
 
-async function getItem(key: string) {
+/**
+ * Получение данных из базы данных
+ * @param key Ключ, по которому нужно получить данные
+ * @returns Пустой массив если данные отсутствуют или массив данных
+ */
+async function getItem(key: string)  {
   const { value } = await Storage.get({ key: key });
   if (typeof value === "string") {
     return JSON.parse(String(value)).data;
@@ -106,6 +129,10 @@ async function getItem(key: string) {
   return [];
 }
 
+/**
+ * Удаление записи
+ * @param uuid UUID записи, по которому нужно удалить запись
+ */
 async function deleteData(uuid: string) {
   var data: Array<DataArray> = await getItem("data");
   for (var i = 0; i < data.length; i++) {
@@ -117,11 +144,17 @@ async function deleteData(uuid: string) {
   updateItem("data", data);
 }
 
+/**
+ * Полное очищение базы данных
+ */
 async function clearStorage() {
   await Storage.clear();
   console.log("Storage Cleared");
 }
 
+/**
+ * Экспорт данных в файл, имеющий вид "exportedData-" + текущая дата в формате
+ */
 async function exportData() {
   var data: Array<DataArray> = await getItem("data");
   if (isPlatform("capacitor")) {
@@ -132,7 +165,6 @@ async function exportData() {
         directory: FilesystemDirectory.Documents,
         encoding: FilesystemEncoding.UTF8,
       });
-      
     } catch (e) {
       console.error("Error: ", e);
     }
@@ -148,7 +180,10 @@ async function exportData() {
   }
 }
 
-async function importData() {
+/**
+ * Импортирование данных в приложение
+ */
+async function importData(JSONStringData?: String) {
   if (isPlatform("android")) {
     try {
       let dataPath = await FileChooser.open();
@@ -161,16 +196,49 @@ async function importData() {
       console.error(e);
     }
   } else if (isPlatform("desktop")) {
-    // TODO:Сделать импорт и для ПК версии
+    // TODO: Сделать импорт и для Desktop(Web) версии
     console.error("Пока не работает");
   }
 }
+
+  /**
+   * Получение данных по типу данных
+   * @param keys Массив ключей по которым нужно получить данные
+   * @param setParsedData UseState Set-функция куда записывать данные
+   */
+   async function getItemsByType(keys: Array<string>, getType: string, setParsedData: React.Dispatch<React.SetStateAction<DataArray[]>>) {
+    var data: Array<DataArray> = [];
+    for (var i = 0; i < keys.length; i++) {
+      var a: Array<DataArray> = await getItem(keys[i]);
+      if (a.length > 0) {
+        if (getType === "Доходы") {
+          for (let j = 0; j < a.length; j++) {
+            const element = a[j];
+            if (element.type === "Доход") {
+              data.push(element);
+            }
+          }
+        } else if (getType === "Расходы") {
+          for (let j = 0; j < a.length; j++) {
+            const element = a[j];
+            if (element.type === "Расход") {
+              data.push(element);
+            }
+          }
+        } else {
+          data.push(...a);
+        }
+      }
+    }
+    setParsedData(data);
+  }
 
 export {
   keys,
   deleteData,
   setItem,
   getItem,
+  getItemsByType,
   updateItem,
   clearStorage,
   exportData,
