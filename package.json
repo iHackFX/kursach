@@ -11,7 +11,7 @@
     "@ionic-native/file": "^5.32.1",
     "@ionic-native/file-chooser": "^5.32.1",
     "@ionic-native/file-transfer": "^5.32.1",
-    "@ionic/react": "^5.5.0",
+    "@ionic/react": "^5.9.4",
     "@ionic/react-router": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
