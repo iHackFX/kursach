@@ -4,7 +4,7 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
-window.screen.orientation.lock('portrait');
+//window.screen.orientation.lock('portrait');
 ReactDOM.render(
   <React.StrictMode>
     <App />
